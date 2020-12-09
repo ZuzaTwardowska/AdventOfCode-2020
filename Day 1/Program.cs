@@ -10,7 +10,7 @@ namespace _1
         {
             List<int> res = new List<int>();
             string path = Directory.GetCurrentDirectory() + "\\" + file;
-            if(!File.Exists(file))
+            if (!File.Exists(file))
             {
                 Console.WriteLine("Couldn't find the file.\n");
                 return res;
@@ -26,18 +26,36 @@ namespace _1
         {
             List<int> data = ReadFile("data.txt");
             bool break_flag = false;
-            foreach(int elem in data)
+            foreach (int elem in data)
             {
-                foreach(int comp in data)
+                foreach (int comp in data)
                 {
-                    if(elem+comp==2020)
+                    if (elem + comp == 2020)
                     {
-                        Console.WriteLine("Result: {0}", comp * elem);
+                        Console.WriteLine("Result for 2 numbers: {0}", comp * elem);
                         break_flag = true;
                         break;
                     }
                     if (break_flag) break;
                 }
+            }
+            break_flag = false;
+            foreach (int elem in data)
+            {
+                foreach (int comp1 in data)
+                {
+                    foreach (int comp2 in data)
+                    {
+                        if (elem + comp1 + comp2 == 2020)
+                        {
+                            Console.WriteLine("Result for 3 numbers: {0}", comp1 * comp2 * elem);
+                            break_flag = true;
+                            break;
+                        }
+                    }
+                    if (break_flag) break;
+                }
+                if (break_flag) break;
             }
         }
     }
