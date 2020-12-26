@@ -4,13 +4,21 @@ using System.Collections.Generic;
 
 namespace _12
 {
-    class Program
+    public class Ship
     {
-        static (int,int,int) NewAction(int east,int north,int direction,string action)
+        int direction;
+        protected int east, north;
+        public Ship()
         {
-            switch(action[0])
+            direction = 90;
+            east = 0;
+            north = 0;
+        }
+        public void NewAction(string action)
+        {
+            switch (action[0])
             {
-                case 'E': 
+                case 'E':
                     east += int.Parse(action.Substring(1));
                     break;
                 case 'W':
@@ -23,10 +31,10 @@ namespace _12
                     north -= int.Parse(action.Substring(1));
                     break;
                 case 'F':
-                    if(direction == 0) north += int.Parse(action.Substring(1));
-                    else if(direction == 180) north -= int.Parse(action.Substring(1));
-                    else if(direction == 90) east += int.Parse(action.Substring(1));
-                    else if(direction == 270) east -= int.Parse(action.Substring(1));
+                    if (direction == 0) north += int.Parse(action.Substring(1));
+                    else if (direction == 180) north -= int.Parse(action.Substring(1));
+                    else if (direction == 90) east += int.Parse(action.Substring(1));
+                    else if (direction == 270) east -= int.Parse(action.Substring(1));
                     break;
                 case 'L':
                     direction -= int.Parse(action.Substring(1));
@@ -39,36 +47,18 @@ namespace _12
             }
             direction %= 360;
             if (direction < 0) direction = 360 + direction;
-            return (east, north, direction);
         }
-        static (int,int) RotateWaypoint(int degrees,int east, int north)
+        public int Record() => Math.Abs(east) + Math.Abs(north);
+    }
+    public class WayportShip : Ship
+    {
+        int east_waypoint, north_waypoint;
+        public WayportShip() : base()
         {
-            if (degrees % 360 == 0) return (east, north);
-            degrees %= 360;
-            if (degrees % 180 != 0)
-            {
-                int p = east;
-                east = north;
-                north = p;
-            }
-            switch(degrees)
-            {
-                case 180:
-                    north *= -1;
-                    east *= -1;
-                    break;
-                case 90:
-                    north *= -1;
-                    break;
-                case 270:
-                    east *= -1;
-                    break;
-                default:
-                    break;
-            }
-            return (east, north);
+            east_waypoint = 10;
+            north_waypoint = 1;
         }
-        static ((int, int),(int,int)) NewActionButWaypoint(int east, int north, string action,int east_waypoint, int north_waypoint)
+        public new void NewAction(string action)
         {
             switch (action[0])
             {
@@ -89,37 +79,63 @@ namespace _12
                     east += int.Parse(action.Substring(1)) * east_waypoint;
                     break;
                 case 'L':
-                    (east_waypoint, north_waypoint) = RotateWaypoint(360 - int.Parse(action.Substring(1)), east_waypoint, north_waypoint);
+                    RotateWaypoint(360 - int.Parse(action.Substring(1)));
                     break;
                 case 'R':
-                    (east_waypoint, north_waypoint) = RotateWaypoint(int.Parse(action.Substring(1)), east_waypoint, north_waypoint);
+                    RotateWaypoint(int.Parse(action.Substring(1)));
                     break;
                 default:
                     break;
             }
-            return ((east, north),(east_waypoint, north_waypoint));
         }
+        void RotateWaypoint(int degrees)
+        {
+            if (degrees % 360 == 0) return;
+            degrees %= 360;
+            if (degrees % 180 != 0)
+            {
+                int p = east_waypoint;
+                east_waypoint = north_waypoint;
+                north_waypoint = p;
+            }
+            switch (degrees)
+            {
+                case 180:
+                    north_waypoint *= -1;
+                    east_waypoint *= -1;
+                    break;
+                case 90:
+                    north_waypoint *= -1;
+                    break;
+                case 270:
+                    east_waypoint *= -1;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    class Program
+    {
         static void Main(string[] args)
         {
             string path = Directory.GetCurrentDirectory() + "\\data.txt";
             StreamReader stream = new StreamReader(path);
-            int east = 0, north = 0, direction = 90;
+            Ship ship = new Ship();
             while (stream.Peek() >= 0)
             {
-                (east, north, direction) = NewAction(east, north, direction,stream.ReadLine());
+                ship.NewAction(stream.ReadLine());
             }
             stream.Close();
-            Console.WriteLine("1.Manhattan distance: {0}",Math.Abs(east)+Math.Abs(north));
+            Console.WriteLine("1.Manhattan distance: {0}",ship.Record());
             stream = new StreamReader(path);
-            east = 0;
-            north = 0;
-            int east_waypoint = 10, north_waypoint = 1;
+            WayportShip whip = new WayportShip();
             while (stream.Peek() >= 0)
             {
-                ((east, north),(east_waypoint, north_waypoint)) = NewActionButWaypoint(east, north, stream.ReadLine(), east_waypoint, north_waypoint);
+                whip.NewAction(stream.ReadLine());
             }
             stream.Close();
-            Console.WriteLine("2.Manhattan distance: {0}", Math.Abs(east) + Math.Abs(north));
+            Console.WriteLine("2.Manhattan distance: {0}", whip.Record());
         }
     }
 }
