@@ -39,7 +39,7 @@ namespace _13
             StreamReader stream = new StreamReader(path);
             int timestamp = int.Parse(stream.ReadLine());
             string[] buses = stream.ReadLine().Split(',');
-            stream.close();
+            stream.Close();
             List<int> bus = new List<int>();
             List<long[]> bus_offset = new List<long[]>();
             int t = 0;
